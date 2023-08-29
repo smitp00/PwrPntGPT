@@ -12,15 +12,16 @@ def get_summary_from_gpt(content):
     }
     
     data = {
-        "prompt": f"Summarize the following text into bullet points:\n{content}",
-        "max_tokens": 100  # You can set the max tokens based on your requirement
+        "prompt": f"Summarize the following text into bullet points in few sentences\n{content}",
+        "max_tokens": 500  # You can set the max tokens based on your requirement
     }
     
-    response = requests.post("https://api.openai.com/v1/engines/davinci-codex/completions", headers=headers, json=data)
+    response = requests.post("https://api.openai.com/v1/engines/davinci/completions", headers=headers, json=data)
     
     if response.status_code == 200:
         result = json.loads(response.text)
         summary = result['choices'][0]['text'].strip()
         return summary
     else:
-        return "Error in summarization"
+        string = "Error:", response.status_code, response.text
+        return string
