@@ -1,27 +1,26 @@
-# my_app/gpt_service.py
-
+# gpt_service.py
 import requests
 import json
 
 def get_summary_from_gpt(content):
-    api_key = "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"
-    
+    api_key = "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"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     
     data = {
-        "prompt": f"Summarize the following text into bullet points in few sentences\n{content}",
-        "max_tokens": 500  # You can set the max tokens based on your requirement
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"Summarize the following text into bullet points:\n{content}"}
+        ]
     }
     
-    response = requests.post("https://api.openai.com/v1/engines/davinci/completions", headers=headers, json=data)
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json={"model": "gpt-4", "messages": data["messages"]})
     
     if response.status_code == 200:
         result = json.loads(response.text)
-        summary = result['choices'][0]['text'].strip()
+        summary = result['choices'][0]['message']['content'].strip()
         return summary
     else:
-        string = "Error:", response.status_code, response.text
-        return string
+        return f"Error in summarization: {response.text}"
