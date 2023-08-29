@@ -1,0 +1,16 @@
+<!-- my_app/templates/upload.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload a PowerPoint File</title>
+</head>
+<body>
+    <h1>Upload a PowerPoint File</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>
