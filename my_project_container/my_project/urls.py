@@ -17,9 +17,11 @@ Including another URLconf
 # my_project/urls.py
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
+from my_app import views  # Assuming your app is called my_app
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('my_app.urls')),  # make sure this line is present
+    path('upload/', views.upload, name='upload'),
+    path('', views.home, name='home'),  # Added a home view
 ]

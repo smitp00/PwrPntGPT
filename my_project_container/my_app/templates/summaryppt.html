@@ -1,0 +1,19 @@
+<!-- my_app/templates/results.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Summarized PowerPoint</title>
+</head>
+<body>
+    <h1>Original Content:</h1>
+    {% for slide in original_content %}
+        <p>{{ slide }}</p>
+    {% endfor %}
+
+    <h1>Summarized Content:</h1>
+    <p>{{ summarized_content }}</p>
+
+    <a href="{% url 'upload' %}">Go Back</a>
+</body>
+</html>
