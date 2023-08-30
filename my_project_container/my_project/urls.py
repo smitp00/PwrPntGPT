@@ -18,10 +18,9 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from my_app import views  # Assuming your app is called my_app
+from my_app import views  # Import your views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('upload/', views.upload, name='upload'),
-    path('', views.home, name='home'),  # Added a home view
+    path('', views.upload, name='upload'),  # Pointing the root URL to the upload view
 ]
