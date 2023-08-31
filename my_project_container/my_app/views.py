@@ -1,12 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from pptx import Presentation
+from pptx.util import Inches
 from docx import Document
 from .gpt_service import get_summary_from_gpt  # Place gpt_service.py in the my_app directory
-
-# Home view to display the welcome message and link to the upload page
-def home(request):
-    return render(request, 'home.html')
 
 # Combined upload view for handling both PowerPoint and Word uploads
 def upload(request):
@@ -16,14 +13,27 @@ def upload(request):
 
         # Handle PowerPoint upload
         if ppt_file and ppt_file.name.endswith('.pptx'):
-            prs = Presentation(ppt_file)
-            slides_text = []
-            for slide in prs.slides:
-                for shape in slide.shapes:
-                    if hasattr(shape, "text"):
-                        slides_text.append(shape.text)
-            summarized_content = get_summary_from_gpt(' '.join(slides_text))
-            return render(request, 'summaryppt.html', {'original_content': slides_text, 'summarized_content': summarized_content})
+            try:
+                prs = Presentation(ppt_file)
+                slides_text = []
+                for slide in prs.slides:
+                    for shape in slide.shapes:
+                        if not shape.has_text_frame:
+                            continue
+                        for paragraph in shape.text_frame.paragraphs:
+                            for run in paragraph.runs:
+                                slides_text.append(run.text)
+                        # Handle table shape
+                        if shape.shape_type == 19:
+                            for row in shape.table.rows:
+                                for cell in row.cells:
+                                    slides_text.append(cell.text)
+                if not slides_text:
+                    return render(request, 'error.html', {'error_message': 'The presentation appears to be empty.'})
+                summarized_content = get_summary_from_gpt(' '.join(slides_text))
+                return render(request, 'summaryppt.html', {'original_content': slides_text, 'summarized_content': summarized_content})
+            except Exception as e:
+                return render(request, 'error.html', {'error_message': str(e)})
 
         # Handle Word upload
         elif word_file and word_file.name.endswith('.docx'):

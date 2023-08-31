@@ -12,7 +12,7 @@ def get_summary_from_gpt(content):
     data = {
         "messages": [
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Summarize the following text into bullet points:\n{content}"}
+            {"role": "user", "content": f"Summarize the following text extracted from a powerpoint or word file :\n{content}"}
         ]
     }
     
