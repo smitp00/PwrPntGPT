@@ -1,20 +1,38 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from pptx import Presentation
-from pptx.util import Inches
 from docx import Document
+import boto3
+import tempfile  # Added for temporary file handling
 from .gpt_service import get_summary_from_gpt  # Place gpt_service.py in the my_app directory
 
-# Combined upload view for handling both PowerPoint and Word uploads
+# Initialize S3 client
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id='AKIAZ7QKAYSCCFSLLRJS',
+    aws_secret_access_key='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',
+    region_name='ca-central-1'
+)
+
+def upload_file_to_s3(file, filename):
+    s3_client.upload_fileobj(file, 'pwrpntgptbucket', filename)
+
+def download_file_from_s3(filename):
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        s3_client.download_file('pwrpntgptbucket', filename, f.name)
+        return f.name
+
 def upload(request):
     if request.method == 'POST':
         ppt_file = request.FILES.get('ppt_file')
         word_file = request.FILES.get('word_file')
 
-        # Handle PowerPoint upload
         if ppt_file and ppt_file.name.endswith('.pptx'):
             try:
-                prs = Presentation(ppt_file)
+                upload_file_to_s3(ppt_file, ppt_file.name)
+
+                temp_file_path_ppt = download_file_from_s3(ppt_file.name)
+                prs = Presentation(temp_file_path_ppt)
                 slides_text = []
                 for slide in prs.slides:
                     for shape in slide.shapes:
@@ -23,24 +41,31 @@ def upload(request):
                         for paragraph in shape.text_frame.paragraphs:
                             for run in paragraph.runs:
                                 slides_text.append(run.text)
+
                         # Handle table shape
                         if shape.shape_type == 19:
                             for row in shape.table.rows:
                                 for cell in row.cells:
                                     slides_text.append(cell.text)
+
                 if not slides_text:
                     return render(request, 'error.html', {'error_message': 'The presentation appears to be empty.'})
+                
                 summarized_content = get_summary_from_gpt(' '.join(slides_text))
                 return render(request, 'summaryppt.html', {'original_content': slides_text, 'summarized_content': summarized_content})
+                
             except Exception as e:
                 return render(request, 'error.html', {'error_message': str(e)})
 
-        # Handle Word upload
         elif word_file and word_file.name.endswith('.docx'):
-            document = Document(word_file)
+            upload_file_to_s3(word_file, word_file.name)
+            temp_file_path_word = download_file_from_s3(word_file.name)
+
+            document = Document(temp_file_path_word)
             doc_text = []
             for para in document.paragraphs:
                 doc_text.append(para.text)
+            
             # Combine all the text into a single string
             full_text = '\n'.join(doc_text)
             # Get the summarized content
