@@ -1,19 +1,25 @@
-<!-- my_app/templates/results.html -->
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Summarized PowerPoint</title>
+    <meta charset="UTF-8">
+    <title>PowerPoint Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 2em;
+        }
+    </style>
 </head>
 <body>
-    <h1>Original Content:</h1>
-    {% for slide in original_content %}
-        <p>{{ slide }}</p>
-    {% endfor %}
 
-    <h1>Summarized Content:</h1>
+    <h1>PowerPoint Summary</h1>
+
+    <h2>Original Content</h2>
+    <p>{{ original_content }}</p>
+
+    <h2>Summarized Content</h2>
     <p>{{ summarized_content }}</p>
 
-    <a href="{% url 'upload' %}">Go Back</a>
 </body>
 </html>
