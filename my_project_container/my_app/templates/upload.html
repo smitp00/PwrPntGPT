@@ -22,7 +22,7 @@
         // File Type and Size Validation
         function validateFileInput(fileInput) {
             var file = fileInput.files[0];
-            var maxSize = 5 * 1024 * 1024; // 500 MB
+            var maxSize = 5 * 1024 * 1024; // 5 MB
             
             // Check File Type
             if (file.type !== 'application/vnd.openxmlformats-officedocument.presentationml.presentation' && 
@@ -44,7 +44,6 @@
     </script>
 </head>
 <body>
-
     <h1>Welcome to PwrPnt GPT</h1>
     <h2>Please upload a Powerpoint (.pptx) or Word Document (.docx) for Summarization Magic!</h2>
 
