@@ -5,14 +5,16 @@ from docx import Document
 import boto3
 import tempfile  # Added for temporary file handling
 from .gpt_service import get_summary_from_gpt  # Place gpt_service.py in the my_app directory
+import os 
 
 # Initialize S3 client
 s3_client = boto3.client(
     's3',
-    aws_access_key_id='AKIAZ7QKAYSCCFSLLRJS',
-    aws_secret_access_key='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',
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID',''),  # Use environment variables
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY',''),
     region_name='ca-central-1'
 )
+
 
 def upload_file_to_s3(file, filename):
     s3_client.upload_fileobj(file, 'pwrpntgptbucket', filename)
