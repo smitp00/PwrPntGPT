@@ -4,8 +4,7 @@ import json
 import os
 
 def get_summary_from_gpt(content):
-    api_key = os.environ.get('GPT_API_KEY', '') #heroku config:set GPT_API_KEY=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
-    headers = {
+    api_key = os.environ.get('GPT_API_KEY', '') 
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
